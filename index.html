@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instagram Reel Downloader</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif; background: #f0f0f0; padding: 30px; text-align: center;
+    }
+    input {
+      width: 80%; padding: 10px; font-size: 16px;
+    }
+    button {
+      padding: 10px 20px; font-size: 16px; margin-left: 10px; cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    video {
+      max-width: 100%; border-radius: 8px;
+    }
+    a.download-link {
+      display: inline-block; margin-top: 10px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Instagram Reel Downloader</h1>
+  <input id="urlInput" type="text" placeholder="Paste Instagram reel or post URL here" />
+  <button onclick="downloadReel()">Download</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function downloadReel() {
+      const url = document.getElementById('urlInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = 'Loading...';
+
+      if (!url) {
+        alert('Please enter Instagram reel URL');
+        resultDiv.innerHTML = '';
+        return;
+      }
+
+      try {
+        // API call to free Instagram download API
+        const apiURL = `https://api-instagram.onrender.com/api/instagram?url=${encodeURIComponent(url)}`;
+        const response = await fetch(apiURL);
+
+        if (!response.ok) throw new Error('Failed to fetch data from API');
+
+        const data = await response.json();
+
+        if (data.error) {
+          resultDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+          return;
+        }
+
+        // Show video preview + download link
+        resultDiv.innerHTML = `
+          <video controls autoplay muted>
+            <source src="${data.video}" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <br/>
+          <a class="download-link" href="${data.video}" download>Download Video</a>
+        `;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
